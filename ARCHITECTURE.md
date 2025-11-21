@@ -17,21 +17,19 @@
 5. **Datos iniciales y pruebas**: `seed_data.py` se ejecuta en el bloque `if __name__ == "__main__"` para crear constantes FASAR y un APU ejemplo. `test_app.py` levanta una base en memoria y valida `calcular_pu` junto con `match_mano_obra` para prevenir regresiones.
 
 ## Frontend (`frontend/`)
-1. **Shell y rutas**: `src/main.tsx` monta React en modo estricto con `BrowserRouter`. `App.tsx` define la cabecera (`AppHeader`) y las rutas `/presupuesto`, `/catalogos` y `/analisis` (landea en Presupuesto por defecto).
-2. **Cliente HTTP**: `src/api/client.ts` crea una instancia `axios` que apunta a `import.meta.env.VITE_API_BASE_URL` o `http://localhost:8000/api`. No hay manejo centralizado de errores; los llamados retornan la data cruda.
+1. **Shell y rutas**: `src/main.tsx` monta React con `BrowserRouter` y arranca `App`. Este maneja la sesión del usuario, protege rutas y expone `/login`, `/analisis`, `/catalogo`, `/comparador` y `/admin` (las rutas publicadas redirigen a `/analisis` cuando no hay sesión).
+2. **Cliente HTTP**: `src/api/client.ts` crea una instancia `axios` configurada con `VITE_API_BASE_URL` o `http://localhost:8000/api`, `Content-Type: application/json` y `withCredentials`. Todos los componentes consumen esta capa a través de `apiFetch`.
 3. **Paginas**:
-   - `PresupuestoPage` renderiza `PresupuestoManager`, componente que coordina proyectos, partidas y detalles (formularios de ajustes, selectores, resumen monetario).
-   - `CatalogosPage` muestra `CatalogosDashboard`, una vista tabulada que reutiliza un CRUD generico por tipo y ofrece simulacion de actualizacion masiva.
-   - `AnalisisPuPage` controla el formulario del concepto, los toggles de sobrecostos, las llamadas a `/api/ia/chat_apu`, persistencia de la matriz y la generacion de notas de venta.
+   - `LoginPage` gestiona el formulario de autenticación y actualiza el contexto del usuario al iniciar sesión.
+   - `CatalogoPage` ofrece una UI simulada para materiales, mano de obra, equipos y maquinaria con pestañas, tarjetas y tablas que todavía no dependen de la API.
+   - `AnalisisPuPage` coordina el formulario de concepto, los factores de sobrecosto, las llamadas a `/api/ia/chat_apu`, la edición de la matriz con `ConceptoMatrizEditor` y la generación de notas mediante `NotaVentaModalFixed`.
+   - `ComparadorPage` y `AdminDashboard` presentan otras vistas protegidas que consumen los endpoints existentes del backend.
 4. **Componentes clave**:
-   - `CatalogosDashboard` (`components/catalogos/CatalogoCrud.tsx`): forma dinamicamente los campos segun el tipo, colorea registros obsoletos y permite editar/borrar desde la tabla.
-   - `ConceptoMatrizEditor`: administra el estado de las filas de matriz, descarga catalogos en memoria, calcula el PU desde el backend cada vez que cambia la tabla, intenta conciliar sugerencias IA con registros reales y expone un modal para registrar insumos faltantes dentro del catalogo. Tambien puede pedir precios de referencia a `/api/catalogos/sugerir_precio_mercado`.
-   - `PresupuestoManager`: sincroniza proyectos, partidas y detalles, arma payloads hacia `/api/proyectos` y `/api/detalles-presupuesto` y calcula un resumen comparando contra `monto_maximo`.
-   - `NotaVentaModal` / `NotaVentaModalFixed`: presentan los resultados de `/api/ventas/crear_nota_venta` y permiten abrir el PDF del backend.
-5. **Estilos y build**: `src/styles.css` define el layout completo (shell, tarjetas, tablas, modal). Vite maneja los comandos `dev`, `build` y `preview`.
+   - `ConceptoMatrizEditor`: administra las filas de la matriz, descarga los catálogos en paralelo y dispara cada cambio hacia `/api/conceptos/calcular_pu`, además de ofrecer herramientas como sugerencias de IA y validaciones de unidades.
+   - `NotaVentaModalFixed`: muestra el resultado de la generación de una nota de venta, incluyendo los totales, el desglose de impuestos y un enlace para descargar el PDF que entrega el backend.
+5. **Estilos y build**: `src/styles.css` define el layout general (variables, tables, tarjetas, acciones). Vite maneja los comandos `dev`, `build` y `preview`.
 
 ## Flujo de datos
 - El frontend usa `apiFetch` para todas las llamadas y depende de respuestas JSON normalizadas (sin `Decimal`). Los catalogos se consultan al cargar `ConceptoMatrizEditor` y se mantienen en memoria para poblar selects, validar unidades y calcular campos por defecto (mermas, rendimientos).
 - Cuando un usuario edita una matriz, el componente arma el payload esperado por `/api/conceptos/calcular_pu` (`matriz` + `factores`) y publica los totales en tiempo real. Al guardar, recrea los registros via `/api/matriz` para mantener la base sincronizada.
-- `PresupuestoManager` descarga el proyecto, vuelve a pedir las partidas y detalles cada vez que cambia la seleccion y, al registrar un detalle, deja que el backend vuelva a calcular el PU usando los factores de cada proyecto.
-- Las sugerencias de IA (JSON) pasan por `mapearSugerenciasDesdeIA`, se muestran al usuario y deben conciliarse con el catalogo antes de guardar la matriz o de generar una nota de venta. Si el concepto esta guardado, la nota de venta reutiliza la matriz almacenada y puede derivar en un PDF generado por Flask.
+  - Las sugerencias de IA (JSON) pasan por `mapearSugerenciasDesdeIA`, se muestran al usuario y deben conciliarse con el catalogo antes de guardar la matriz o de generar una nota de venta. Si el concepto esta guardado, la nota de venta reutiliza la matriz almacenada y puede derivar en un PDF generado por Flask.

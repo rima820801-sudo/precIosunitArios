@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import { API_BASE_URL } from './api/client';
 import { UserInfo } from './types/user';
 import { UserContext } from './context/user';
+import { AppHeader } from './components/layout/AppHeader';
 
 function App() {
     const [user, setUser] = useState<UserInfo | null>(null);
@@ -61,30 +62,35 @@ function App() {
 
     return (
         <UserContext.Provider value={user}>
-            <Routes>
-                <Route
-                    path="/login"
-                    element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/analisis" replace />}
-                />
-                <Route
-                    path="/analisis"
-                    element={isAuthenticated ? <AnalisisPuPage /> : <Navigate to="/login" replace />}
-                />
-                <Route
-                    path="/catalogo"
-                    element={isAuthenticated ? <CatalogoPage /> : <Navigate to="/login" replace />}
-                />
-                <Route
-                    path="/comparador"
-                    element={isAuthenticated ? <ComparadorPage /> : <Navigate to="/login" replace />}
-                />
-                <Route
-                    path="/admin"
-                    element={isAuthenticated && isAdmin ? <AdminDashboard /> : <Navigate to="/analisis" replace />}
-                />
-                <Route path="/" element={<Navigate to="/analisis" replace />} />
-                <Route path="*" element={<Navigate to="/analisis" replace />} />
-            </Routes>
+            <div className="app-shell">
+                <AppHeader />
+                <main className="app-content">
+                    <Routes>
+                        <Route
+                            path="/login"
+                            element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/analisis" replace />}
+                        />
+                        <Route
+                            path="/analisis"
+                            element={isAuthenticated ? <AnalisisPuPage /> : <Navigate to="/login" replace />}
+                        />
+                        <Route
+                            path="/catalogo"
+                            element={isAuthenticated ? <CatalogoPage /> : <Navigate to="/login" replace />}
+                        />
+                        <Route
+                            path="/comparador"
+                            element={isAuthenticated ? <ComparadorPage /> : <Navigate to="/login" replace />}
+                        />
+                        <Route
+                            path="/admin"
+                            element={isAuthenticated && isAdmin ? <AdminDashboard /> : <Navigate to="/analisis" replace />}
+                        />
+                        <Route path="/" element={<Navigate to="/analisis" replace />} />
+                        <Route path="*" element={<Navigate to="/analisis" replace />} />
+                    </Routes>
+                </main>
+            </div>
         </UserContext.Provider>
     );
 }
