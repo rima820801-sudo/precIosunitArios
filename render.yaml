@@ -16,4 +16,4 @@ services:
       - key: SECRET_KEY
         generateValue: true
     autoDeploy: true
-    repo: precios-unitarios
+    repo: rima820801-sudo/preclosunitArios
