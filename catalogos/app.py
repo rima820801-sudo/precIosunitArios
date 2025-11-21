@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import inspect, text
 from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
@@ -66,6 +67,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     def set_password(self, password): self.password_hash = generate_password_hash(password)
     def check_password(self, password): return check_password_hash(self.password_hash, password)
 
@@ -190,7 +192,10 @@ def login():
     user = User.query.filter_by(username=data.get("username")).first()
     if user and user.check_password(data.get("password")):
         session['user_id'] = user.id
-        return jsonify({"message": "OK", "user": {"id": user.id, "username": user.username}}), 200
+        return jsonify({
+            "message": "OK",
+            "user": {"id": user.id, "username": user.username, "is_admin": bool(user.is_admin)},
+        }), 200
     return jsonify({"error": "Credenciales inválidas"}), 401
 
 @app.route("/api/auth/logout", methods=["POST"])
@@ -203,7 +208,7 @@ def me():
     user_id = session.get('user_id')
     if not user_id: return jsonify({"error": "No autenticado"}), 401
     u = User.query.get(user_id)
-    return jsonify({"id": u.id, "username": u.username})
+    return jsonify({"id": u.id, "username": u.username, "is_admin": bool(u.is_admin)})
 
 @app.route("/api/proyectos", methods=["GET", "POST"])
 def proyectos():
@@ -284,7 +289,13 @@ def home():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        inspector = inspect(db.engine)
+        columns = {col["name"] for col in inspector.get_columns("users")}
+        if "is_admin" not in columns:
+            db.engine.execute(text('ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT 0'))
         if not User.query.filter_by(username="Sarsjs88").first():
-            u = User(username="Sarsjs88"); u.set_password("bRyJaSa108288"); db.session.add(u); db.session.commit()
+            u = User(username="Sarsjs88", is_admin=True)
+            u.set_password("bRyJaSa108288")
+            db.session.add(u); db.session.commit()
             print("✅ Usuario administrador creado")
     app.run(host="0.0.0.0", port=8000)

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: precios-unitarios-backend
+    env: python
+    plan: starter
+    region: ord
+    buildCommand: pip install -r catalogos/requirements.txt
+    startCommand: python catalogos/app.py
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: FLASK_ENV
+        value: production
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash
+      - key: SECRET_KEY
+        generateValue: true
+    autoDeploy: true
+    repo: precios-unitarios
