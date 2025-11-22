@@ -1,28 +1,43 @@
-import sqlite3
+# migratate_db.py (Asegúrate que este archivo está dentro de la carpeta 'catalogos')
+
 import os
+from sqlalchemy import text, inspect
+# Importa los objetos necesarios de app.py (ajusta si la importación cambia)
+from app import app, db, User 
 
-db_path = os.path.join("catalogos", "data.sqlite3")
-if not os.path.exists(db_path):
-    print(f"Database not found at {db_path}")
-    exit(1)
+def initialize_db():
+    with app.app_context():
+        # 1. Crea todas las tablas que no existan (incluyendo 'users')
+        db.create_all()
+        print("✅ Tablas creadas/verificadas.")
 
-conn = sqlite3.connect(db_path)
-c = conn.cursor()
+        # 2. Revisa y añade la columna 'is_admin' si es una migración vieja
+        inspector = inspect(db.engine)
+        if "users" in inspector.get_table_names():
+            columns = {col["name"] for col in inspector.get_columns("users")}
+            if "is_admin" not in columns:
+                try:
+                    db.engine.execute(text('ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT FALSE'))
+                    db.session.commit()
+                    print("✅ Columna 'is_admin' agregada.")
+                except Exception as e:
+                    print(f"Error al agregar columna: {e}")
+            
+        # 3. Crea el usuario administrador si no existe
+        if not User.query.filter_by(username="Sarsjs88").first():
+            u = User(username="Sarsjs88", is_admin=True)
+            u.set_password("bRyJaSa108288")
+            db.session.add(u)
+            db.session.commit()
+            print("👤 Usuario administrador 'Sarsjs88' creado exitosamente.")
+        else:
+            print("👤 Usuario administrador ya existe. Saltando creación.")
+            
+        print("Migración de inicialización completada.")
 
-print("Migrating database...")
-
-try:
-    c.execute('ALTER TABLE matriz_insumo ADD COLUMN rendimiento_jornada NUMERIC(10, 4)')
-    print("Added rendimiento_jornada column")
-except sqlite3.OperationalError as e:
-    print(f"rendimiento_jornada column might already exist: {e}")
-
-try:
-    c.execute('ALTER TABLE matriz_insumo ADD COLUMN factor_uso NUMERIC(10, 4)')
-    print("Added factor_uso column")
-except sqlite3.OperationalError as e:
-    print(f"factor_uso column might already exist: {e}")
-
-conn.commit()
-conn.close()
-print("Migration complete.")
+if __name__ == "__main__":
+    # La aplicación debe usar la URL de PostgreSQL aquí (definida en app.py)
+    if not os.environ.get('DATABASE_URL'):
+        print("ADVERTENCIA: Usando SQLite local. Asegúrate de que DATABASE_URL esté definida en producción.")
+    
+    initialize_db()
