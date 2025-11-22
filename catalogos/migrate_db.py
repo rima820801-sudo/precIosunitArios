@@ -25,8 +25,14 @@ def initialize_db():
             
         # 3. Crea el usuario administrador si no existe
         if not User.query.filter_by(username="Sarsjs88").first():
+            admin_password = os.environ.get('ADMIN_PASSWORD')
+            if not admin_password:
+                print("❌ Error: La variable de entorno ADMIN_PASSWORD no está definida.")
+                print("No se puede crear el usuario administrador sin una contraseña.")
+                return
+
             u = User(username="Sarsjs88", is_admin=True)
-            u.set_password("bRyJaSa108288")
+            u.set_password(admin_password)
             db.session.add(u)
             db.session.commit()
             print("👤 Usuario administrador 'Sarsjs88' creado exitosamente.")

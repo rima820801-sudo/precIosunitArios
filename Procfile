@@ -1,0 +1,1 @@
+web: python catalogos/migrate_db.py && gunicorn --chdir catalogos --bind 0.0.0.0:$PORT app:app

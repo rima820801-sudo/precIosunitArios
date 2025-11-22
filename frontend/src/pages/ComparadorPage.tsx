@@ -195,31 +195,6 @@ export default function ComparadorPage() {
     return (
         <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
 
-            {/* Navbar */}
-            <nav className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm h-16 flex-shrink-0 z-20">
-                <div className="flex items-center gap-3">
-                    <div className="bg-indigo-600 text-white p-1.5 rounded-lg"><BoxSelect className="w-5 h-5" /></div>
-                    <h1 className="text-lg font-bold text-slate-800 tracking-tight">APU <span className="font-normal text-slate-400">| Builder IA</span></h1>
-                    <div className="ml-8 flex space-x-1 text-sm font-medium">
-                        <button onClick={() => window.location.href = '/analisis'} className="text-gray-500 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md transition-colors">Análisis APU</button>
-                        <button onClick={() => window.location.href = '/catalogo'} className="text-gray-500 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md transition-colors">Catálogo</button>
-                        <button className="text-indigo-600 bg-indigo-50 px-3 py-2 rounded-md cursor-default">Comparador</button>
-                    </div>
-                </div>
-                <div className="flex bg-gray-100 p-1 rounded-lg">
-                    <button onClick={() => setView('active')} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${view === 'active' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>Cotizador</button>
-                    <button onClick={() => setView('history')} className={`px-4 py-1.5 text-xs font-medium rounded-md transition-all ${view === 'history' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500'}`}>Guardados ({historial.length})</button>
-                </div>
-                {currentUser?.is_admin && (
-                    <button
-                        onClick={() => (window.location.href = '/admin')}
-                        className="ml-4 bg-gray-900 hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-all"
-                    >
-                        Dashboard Admin
-                    </button>
-                )}
-            </nav>
-
             <div className="max-w-6xl mx-auto px-6 py-8">
 
                 {/* VISTA COTIZADOR */}

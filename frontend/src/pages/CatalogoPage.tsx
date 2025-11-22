@@ -172,23 +172,6 @@ export default function CatalogoPage() {
                 {CATALOG_UNITS.map(u => <option key={u} value={u} />)}
             </datalist>
 
-            {/* Navbar Superior */}
-            <nav className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm h-16 flex-shrink-0 z-20">
-                <div className="flex items-center gap-3">
-                    <div className="bg-indigo-600 text-white p-1.5 rounded-lg"><BoxSelect className="w-5 h-5" /></div>
-                    <h1 className="text-lg font-bold text-slate-800 tracking-tight">APU <span className="font-normal text-slate-400">| Builder IA</span></h1>
-                    <div className="ml-8 flex space-x-1 text-sm font-medium">
-                        <button onClick={() => window.location.href = '/analisis'} className="text-gray-500 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md transition-colors">Análisis APU</button>
-                        <button className="text-indigo-600 bg-indigo-50 px-3 py-2 rounded-md cursor-default">Catálogo</button>
-                        <button onClick={() => window.location.href = '/comparador'} className="text-gray-500 hover:text-indigo-600 hover:bg-gray-50 px-3 py-2 rounded-md transition-colors">Comparador</button>
-                    </div>
-                </div>
-                <div className="relative">
-                    <Search className="absolute left-3 top-2.5 text-gray-400 w-4 h-4" />
-                    <input type="text" placeholder="Buscar..." className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-64 focus:ring-2 focus:ring-indigo-500 bg-gray-50 focus:bg-white transition-colors" />
-                </div>
-            </nav>
-
             {/* Contenido Principal */}
             <div className="max-w-7xl mx-auto px-8 py-6 flex-1 w-full flex flex-col">
 
