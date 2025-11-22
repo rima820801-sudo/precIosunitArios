@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig, type Method } from "axios";
 
+// Forzamos la dirección real para evitar errores de variables
 export const API_BASE_URL = "https://preciosunitarios.onrender.com/api";
 
 const client = axios.create({
