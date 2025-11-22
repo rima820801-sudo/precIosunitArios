@@ -11,11 +11,11 @@
         { "src": "/(.*)", "dest": "/index.html" }
     ],
     "env": {
-        "VITE_API_BASE_URL": "https://<BACKEND_URL>/api"
+        "VITE_API_BASE_URL": "https://preciosunitarios.onrender.com/api"
     },
     "build": {
         "env": {
-            "VITE_API_BASE_URL": "https://<BACKEND_URL>/api"
+            "VITE_API_BASE_URL": "https://preciosunitarios.onrender.com/api"
         }
     }
 }
