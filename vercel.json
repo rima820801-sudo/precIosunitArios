@@ -1,21 +1,19 @@
 {
-    "version": 2,
-    "builds": [
-        {
-            "src": "frontend/package.json",
-            "use": "@vercel/static-build",
-            "config": { "distDir": "frontend/dist" }
-        }
-    ],
-    "routes": [
-        { "src": "/(.*)", "dest": "/index.html" }
-    ],
-    "env": {
-        "VITE_API_BASE_URL": "https://preciosunitarios.onrender.com/api"
-    },
-    "build": {
-        "env": {
-            "VITE_API_BASE_URL": "https://preciosunitarios.onrender.com/api"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "frontend/dist" }
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_BASE_URL": "https://preciosunitarios.onrender.com/api"
+  }
 }
